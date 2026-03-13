@@ -1,0 +1,136 @@
+esphome:
+  name: shed-water-tank1
+  friendly_name: Shed Water Tank1
+
+esp8266:
+  board: d1_mini
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "vOgfrzbmX5m94CM0HHBW+Hyf/CScgX3wBpsHd54I5uw="
+
+ota:
+  - platform: esphome
+    password: "0d049fbe8fe826aff09c5052e3b56a85"
+
+web_server:
+  version: 3
+  auth:
+    username: !secret web_server_username
+    password: !secret web_server_password
+  sorting_groups:
+
+    - id: sorting_group_button_settings
+      name: "Buttons"
+      sorting_weight: 20
+
+    - id: sorting_group_diagnostics_settings
+      name: "Diagnostics"
+      sorting_weight: 10
+
+    - id: sorting_group_LED_settings
+      name: "LED"
+      sorting_weight: 30
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  post_connect_roaming: false
+  
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Shed-Water-Tank1"
+    password: "w5DMmCHERL5j"
+
+
+  # Optional manual IP
+  manual_ip:
+    static_ip: 192.168.0.88
+    gateway: 192.168.0.1
+    dns1: 192.168.0.6
+
+    subnet: 255.255.255.0
+
+
+
+button:
+  - platform: restart
+    name: Restart
+    entity_category: config
+    web_server:
+      sorting_group_id: sorting_group_button_settings
+  - platform: factory_reset
+    name: Factory Reset
+    id: Reset
+    web_server:
+      sorting_group_id: sorting_group_button_settings
+  - platform: safe_mode
+    name: Safe Mode
+    internal: false
+    web_server:
+      sorting_group_id: sorting_group_button_settings
+captive_portal: null
+
+
+
+sensor:
+  # Raw ADC voltage
+  - platform: adc
+    pin: A0
+    name: "Tank ADC Voltage"
+    id: tank_adc_voltage
+    icon: "mdi:lightning-bolt"
+    update_interval: 1s
+
+  # Calculated resistance of the float ladder
+  - platform: template
+    name: "Tank Sensor Resistance"
+    id: tank_resistance
+    unit_of_measurement: "Ω"
+    icon: "mdi:omega"
+    accuracy_decimals: 0
+    update_interval: 1s
+    lambda: |-
+      const float Vcc = 3.3;
+      // const float R_fixed = 10000.0;  // 10k resistor
+      const float R_fixed = 33000.0;  // 33k resistor
+      float Vout = id(tank_adc_voltage).state;
+
+      if (Vout <= 0.01) return NAN;
+      if (Vout >= Vcc - 0.01) return NAN;
+
+      // Voltage divider formula:
+      // R_sensor = R_fixed * (Vout / (Vcc - Vout))
+      float R_sensor = R_fixed * (Vout / (Vcc - Vout));
+      return R_sensor;
+
+  # Tank percentage based on resistance ranges
+  - platform: template
+    name: "Tank Level"
+    id: tank_level
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    icon: "mdi:water-percent"
+    update_interval: 1s
+    lambda: |-
+      float r = id(tank_resistance).state;
+      if (isnan(r)) return NAN;
+
+      if (r >= 868 && r <= 927) return 100;
+      if (r >= 929 && r <= 1020) return 90;
+      if (r >= 1022 && r <= 1119) return 80;
+      if (r >= 1121 && r <= 1256) return 70;
+      if (r >= 1258 && r <= 1457) return 60;
+      if (r >= 1459 && r <= 1714) return 50;
+      if (r >= 1716 && r <= 2025) return 40;
+      if (r >= 2027 && r <= 2478) return 30;
+      if (r >= 2480 && r <= 3274) return 20;
+      if (r >= 3276 && r <= 4839) return 10;
+      if (r >= 4841 && r <= 5916) return 0;
+
+      // Out of expected range
+      return NAN;
