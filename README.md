@@ -1,2 +1,3 @@
-# shed-water-tank1
-Shed water tank# 1 esphome code
+I have included the Tank.png file for use in the dashboard
+
+
