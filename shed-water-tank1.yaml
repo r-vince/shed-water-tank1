@@ -11,11 +11,11 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: "vOgfrzbmX5m94CM0HHBW+Hyf/CScgX3wBpsHd54I5uw="
+    key: "*************************************"
 
 ota:
   - platform: esphome
-    password: "0d049fbe8fe826aff09c5052e3b56a85"
+    password: "*************************************"
 
 web_server:
   version: 3
@@ -44,12 +44,12 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Shed-Water-Tank1"
-    password: "w5DMmCHERL5j"
+    password: "**********"
 
 
   # Optional manual IP
   manual_ip:
-    static_ip: 192.168.0.88
+    static_ip: 192.168.0.xx
     gateway: 192.168.0.1
     dns1: 192.168.0.6
 
