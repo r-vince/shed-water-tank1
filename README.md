@@ -1,4 +1,10 @@
-I have included the Tank.png file for use in the dashboard this file needs to go into the /config/www folder in HA
+I have included the Tank.png file for use in the dashboard this file needs to go into the /config/www folder in HA. Here is a screen shot of my tanks dashboard.
+
+<img width="505" height="862" alt="Tank Dashboard Screenshor" src="https://github.com/user-attachments/assets/12273143-3042-43ce-ac4e-115f57ce7cb4" />
+
+
+
+
 <img width="237" height="139" alt="Tank on dashboard" src="https://github.com/user-attachments/assets/21c02ef2-4a42-4019-9ab0-24eba30a747a" />
 
 These are the type of float switch i have used.
